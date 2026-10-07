@@ -14,7 +14,13 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        float limitX = 9.5f;
+        float limitY = 5.5f;
+        Vector2 pos = transform.position;
+        if (pos.x > limitX || pos.x < -limitX || pos.y > limitY || pos.y < -limitY)
+        {
+            Destroy(gameObject);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)

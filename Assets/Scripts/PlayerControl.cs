@@ -1,15 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Spaceship : MonoBehaviour
+public class PlayerControl : MonoBehaviour
 {
     public float thrust = 6;
     public float turnSpeed = 200;
-    public float maxSpeed = 5;
+    public float maxSpeed = 2;
     public float fireCooldown = 0.25f;
 
     public GameObject bulletFab;
-    public Transform firePoint;
+
+    float invincibilityTimer = 0f;
+    SpriteRenderer renderer;
 
     Rigidbody2D rb;
     float fireTimer = 0;
@@ -18,11 +20,23 @@ public class Spaceship : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        renderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (invincibilityTimer > 0)
+        {
+            invincibilityTimer = invincibilityTimer - Time.deltaTime;
+            // Make player green if invincible
+            renderer.color = Color.green;
+        }
+        else
+        {
+            renderer.color = Color.white;
+        }
+
         Keyboard keys = Keyboard.current;
 
         // Rotation logic
@@ -47,8 +61,30 @@ public class Spaceship : MonoBehaviour
         fireTimer = fireTimer - Time.deltaTime;
         if (keys.spaceKey.isPressed && fireTimer <= 0)
         {
-            Instantiate(bulletFab, firePoint.position, transform.rotation);
+            Instantiate(bulletFab, transform.position, transform.rotation);
             fireTimer = fireCooldown;
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Asteroid") && invincibilityTimer <= 0)
+        {
+            if (other.GetComponent<Asteroid>().isLife)
+            {
+                GameManager.instance.AddLife();
+                Destroy(other.gameObject);
+            } 
+            else
+            {
+                GameManager.instance.Death();
+            }
+            
+        }
+    }
+
+    public void Invincify()
+    {
+        invincibilityTimer = 3;
     }
 }
