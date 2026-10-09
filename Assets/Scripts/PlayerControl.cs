@@ -21,6 +21,7 @@ public class PlayerControl : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         renderer = GetComponent<SpriteRenderer>();
+        Invincify();
     }
 
     // Update is called once per frame
